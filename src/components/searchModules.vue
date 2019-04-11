@@ -2,6 +2,24 @@
   <div id="show-modules">
     <h1>Search NUS Modules</h1>
     <input type= "text" v-model="search" placeholder="search modules"/>
+    <div>
+      <!-- Using modifiers -->
+      <b-button v-b-toggle.collapse-2 class="m-1">Advanced Search</b-button>
+
+      <!-- Element to collapse -->
+      <b-collapse id="collapse-2">
+        <b-card>
+          <div>
+            Choose Webcast Availability:
+            <b-form-select v-model="webcast" :options="options_webcast"></b-form-select>
+            Choose SU Option:
+            <b-form-select v-model="SU" :options="options_SU"></b-form-select>
+            Department:
+            <input type= "text" v-model="department" placeholder="search department"/>
+          </div>
+        </b-card>
+      </b-collapse>
+    </div>
     <div v-for="module in filteredModules" :key="module.id" class="single-module">
       <!--  <router-link :to="'/module/'+module['.key']"> <h2>{{ module[".key"] }} </h2> </router-link> -->
       <router-link :to="'/Module/'+module.ModuleCode"> <h2>{{ module.ModuleCode }} </h2> </router-link>
@@ -51,7 +69,20 @@ export default {
   data () {
     return {
       search: '',
-      test: 123
+      SU: '',
+      department: '',
+      test: 123,
+      webcast: '',
+      options_webcast: [
+          { value: '', text: 'Choose Webcast Availability' },
+          { value: 'Webcast', text: 'Webcast Available' },
+          { value: 'No Webcast', text: 'No Webcast Available' },
+      ],
+      options_SU: [
+          { value: '', text: 'Choose SU Option' },
+          { value: 'SU', text: 'SU Option Available' },
+          { value: 'No SU', text: 'No SU Option Available' },
+      ],
     }
   },
   methods:{
@@ -71,11 +102,40 @@ export default {
       // console.log(modsInfo)
       
       // this.getData();
+      if (this.webcast != '') {
+        return this.modules.filter((module) => {
+        // return module['.key'].match(this.search.toUpperCase())
+        if (module.Webcast === this.webcast) {return module.Webcast}
+      })
+      }
+
+      if (this.SU != '') {
+        return this.modules.filter((module) => {
+        // return module['.key'].match(this.search.toUpperCase())
+        if (module.SU === this.SU) {return module.SU}
+      })
+      }
+
+      if (this.department != '') {
+        console.log(this.department)
+        return this.modules.filter((module) => {
+          // return module['.key'].match(this.search.toUpperCase())
+          return module.Department.toUpperCase().match(this.department.toUpperCase())
+      })
+      }
+      
+      if (this.search != ''){
+        return this.modules.filter((module) => {
+          // return module['.key'].match(this.search.toUpperCase())
+          return module.ModuleCode.match(this.search.toUpperCase())
+      })
+      }
+
       return this.modules.filter((module) => {
         // return module['.key'].match(this.search.toUpperCase())
-        return module.ModuleCode.match(this.search.toUpperCase())
-      })
-    }
+        return module
+    })
+  }
   }
 }
 </script>
