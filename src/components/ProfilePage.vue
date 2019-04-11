@@ -18,6 +18,7 @@
           <div class='green-column'>
             <h2>Graduation Requirements</h2>
             <h3><u>Graduation Progression</u></h3>
+            <b-progress :value="progression" class="mb-3"></b-progress>
             <p><b> &#x25a2; No. of MCs completed: </b>{{totalMC}}/180MCs </p>
             <p><b>&#x25a2; ULR (GEM): </b> {{ sumGEM }}/{{Object.keys(this.student.GradReq.GEM).length.toString()}} Modules &#8594; {{ sumGEM*4 }}MCs/{{Object.keys(this.student.GradReq.GEM).length*4}}MCs</p>
             <p><b> &#x25a2; 1k Modules taken: </b>{{ sumLevel1 }}/{{Object.keys(this.student.GradReq.Level1).length.toString()}} Modules &#8594; {{ sumLevel1*4 }}MCs/{{Object.keys(this.student.GradReq.Level1).length*4}}MCs</p>
@@ -52,6 +53,7 @@
                       <th>Module Code</th>
                       <th>Completed</th>
                       <th>Modular Credits</th>
+                      <th>Prerequisites</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -59,6 +61,7 @@
                       <td>{{ key }}</td>
                       <td >{{completed(value)}}</td>
                       <td>{{moreMC(key)}}</td>
+                      <td>None</td>
                     </tr>
                   </tbody>
                 </table>
@@ -70,6 +73,7 @@
                       <th>Module Code</th>
                       <th>Completed</th>
                       <th>Modular Credits</th>
+                      <th>Prerequisites</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -77,6 +81,7 @@
                       <td>{{ key }}</td>
                       <td>{{completed(value)}}</td>
                       <td>{{moreMC(key)}}</td>
+                      <td>{{ Prereq['Core'][key] }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -93,12 +98,14 @@
                       <th>Module Code</th>
                       <th>Completed</th>
                       <th>Modular Credits</th>
+                      <th>Prerequisites</th>
                     </tr>
                   </thead>
                   <tbody>
                       <td>BT4101</td>
                       <td :class="{'text-complete': completed(this.student.GradReq.ElecOpt.BT4101) === 'Completed'}">{{completed(this.student.GradReq.ElecOpt.BT4101)}}</td>
                       <td>12</td>
+                      <td>{{ Prereq['BT4101'] }}</td>
                   </tbody>
                 </table>
                 
@@ -109,6 +116,7 @@
                       <th>Module Code</th>
                       <th>Completed</th>
                       <th>Modular Credits</th>
+                      <th>Prerequisites</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -116,6 +124,7 @@
                       <td>{{ key }}</td>
                       <td>{{completed(value)}}</td>
                       <td>{{moreMC(key)}}</td>
+                      <td>{{ Prereq['A'][key] }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -127,6 +136,7 @@
                       <th>Module Code</th>
                       <th>Completed</th>
                       <th>Modular Credits</th>
+                      <th>Prerequisites</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -134,6 +144,7 @@
                       <td>{{ key }}</td>
                       <td>{{completed(value)}}</td>
                       <td>{{moreMC(key)}}</td>
+                      <td>{{ Prereq['B'][key] }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -145,6 +156,7 @@
                       <th>Module Code</th>
                       <th>Completed</th>
                       <th>Modular Credits</th>
+                      <th>Prerequisites</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -152,6 +164,7 @@
                       <td>{{ key }}</td>
                       <td>{{completed(value)}}</td>
                       <td>{{moreMC(key)}}</td>
+                      <td>{{ Prereq['C'][key] }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -163,12 +176,14 @@
                       <th>Module Code</th>
                       <th>Completed</th>
                       <th>Modular Credits</th>
+                      <th>Prerequisites</th>
                     </tr>
                   </thead>
                   <tbody>
                       <td>IS4010</td>
                       <td :class="{'text-complete': completed(this.student.GradReq.Attachment) === 'Completed'}">{{completed(this.student.GradReq.Attachment)}}</td>
                       <td>12</td>
+                      <td>[IS2101 or CS2101] and [IS1105 or IS3101 or IS3103] and [IS2103 or CS2107 or (BT2101 and BT2102)]</td>
                   </tbody>
                 </table>
                 <p> <u>3. Unrestricted Electives: Subtotal 32 MCS </u></p>
@@ -227,9 +242,66 @@ export default {
           "UEM":{"UEM1":0,"UEM2":0,"UEM3":0,"UEM4":0,"UEM5":0,"UEM6":0,"UEM7":0,"UEM8":0},
           "Level1":{"GEH":0,"GEQ":1,"GER":1,"GES":0,"GET":0,"BT1101":1,"CS1010S":1,"CS1020":1,"EC1301":1,"IS1103/X":0,"MA1101R":1,"MA1521":1,"MKT1705X":1,"mod1":0,"mod2":0}
         }
+      },
+      Prereq: {
+        Core: {
+          "BT1101":"None",
+          "CS1010S":"None",
+          "CS1020":"CS1010",
+          "CS2010":"CS1020 or CS1020E or CG1103",
+          "EC1301":"None",
+          "IS1103/X":"None",
+          "MA1101R":"None",
+          "MA1521":"None",
+          "MKT1705X":"None",
+          "BT2101":"(CS1010 or its equivalent) and (MA1521 or MA1102R) and BT1101",
+          "BT2102":"(CS1010 or its equivalent) and BT1101",
+          "IS2101":"ES1000 and/or ES1102/ES1103 for students who are required to take",
+          "ST2334":"MA1102R or MA1312 or MA1505 or MA1507 or MA1521",
+          "BT3102":"BT2101 and (CS1020/E or CS2020 or CS2030 or CS2103/T or CS2113/T)",
+          "BT3103":"BT2102 ",
+          "IS3103":"(IS1103 or equivalent) and (CS2101 or IS2101)",
+          "BT4103":"-"
+          },
+          BT4101: 'Attained at least 70% of the MC requirement for degree',
+          A: {
+            "DBA3712":'DAO2702',
+            "IE3120":'IE2100 or DBA3711',
+            "IS3240":'IS1103/X and (IS2102 or BT2102)',
+            "BT4013":'BT3102',
+            "BT4016":'BT2101 and BT2102',
+            "BT4211":'MKT1705X and [(BT2101 and BT2102) or (DBA3803 and IT3010)]',
+            "BT4212":'CS1010S or its equivalent and BT2101 and ST2334',
+            "DBA4811":'DAO2702',
+            "IS4241":'[(CS1010 or equivalent) and (IS1103 or IS1103FC or IS1103X)] or [(CS1010 or equivalent) and BT1101] or [DAO2702 and IT3010]',
+            "IS4250":'IS1103 or equivalent',
+            "MKT4812":'MKT1705/MKT1705X or RE3704.'
+          },
+          B: {
+            "IE2110":'None',
+            "CS3244":'(CS2010 or CS2020 or CS2040 or CS2040C) and (ESP1107 or ESP2107 ST1232 or ST2131 or ST2132 or ST2334) and (MA1102R or MA1505 or (MA1511 and MA1512) or MA1521) and (MA1101R or MA1311 or MA1506 or MA1508E)',
+            "DBA3803":'DAO2702',
+            "BSE4711":'-',
+            "BT4012":'BT3102',
+            "BT4015":'-',
+            "BT4221":'BT2101 and BT2102 and (CS2010 or CS2020 or CS2040/C)',
+            "BT4222":'[(CS1010 or equivalent) and BT2101 and BT2102] or [DAO2702 and DBA3803 and IT3010]',
+            "BT4240":'[MA1311 or MA1101R] and [MA1521 Calculus for Computing or MA1102R Calculus] and [BT2101 Decision Making Methods and Tools]',
+            "IS4241":'[(CS1010 or equivalent) and (IS1103 or IS1103FC or IS1103X)] or [(CS1010 or equivalent) and BT1101] or [DAO2702 and IT3010]',
+            "IE4210":'IE2110',
+            "ST3131":'ST2131 or MA2216 or ST2334',
+            "ST4245":'ST3131'
+          },
+          C: {
+            "IS3221":'[(CS1010 or equivalent) and (IS1103 or IS1103FC or IS1103X)] or [(CS1010 or equivalent) and BT1101] or [DAO2702 and IT3010]',
+            "IS3261":'(CS1020 or equivalent) or CS2020 or CS2030 or CS2040/C',
+            "BT4014":'BT2102',
+            "IS4228":'IS3101 or IS3103',
+            "IS4302":'(CS2102 or BT2102) and (CS1020 or its equivalent or CS2030 or CS2103/T or CS2113/T)'
+          }
+        }
       }
-    }
-  },
+    },
   methods: {
     completed: function(value) {
       if (value ==1) {
@@ -396,6 +468,9 @@ export default {
       }
       return countable
     },
+    progression: function(){
+      return this.totalMC/180*100
+    },
   }
 }
 </script>
@@ -432,7 +507,7 @@ export default {
 }
 
 .blue-column {
-  background-color: #EAEAEA;
+  background-color: #F8F8F8;
   height: 450px;
   margin: 20px;
   width: 300px;
@@ -442,7 +517,7 @@ export default {
 }
 
 .green-column {
-    background-color: #EAEAEA;
+    background-color: #F8F8F8;
     margin: 20px;
     width: 800px;
     padding-top: 20px;
@@ -520,5 +595,12 @@ tfoot tr:last-child td:last-child {
 
 .text-complete {
     background-color: #66ff00 !important;
+  }
+
+.box1{
+  width: 300px;
+  height: 80px;
+  display: inline-block; /* Change this to block and see what happens */
+  position:relative;
   }
 </style>
