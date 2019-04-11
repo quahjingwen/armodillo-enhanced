@@ -261,7 +261,7 @@ export default {
           "BT3102":"BT2101 and (CS1020/E or CS2020 or CS2030 or CS2103/T or CS2113/T)",
           "BT3103":"BT2102 ",
           "IS3103":"(IS1103 or equivalent) and (CS2101 or IS2101)",
-          "BT4103":"-"
+          "BT4103":"BT2101 and BT2102 and IS2101"
           },
           BT4101: 'Attained at least 70% of the MC requirement for degree',
           A: {
@@ -281,12 +281,12 @@ export default {
             "IE2110":'None',
             "CS3244":'(CS2010 or CS2020 or CS2040 or CS2040C) and (ESP1107 or ESP2107 ST1232 or ST2131 or ST2132 or ST2334) and (MA1102R or MA1505 or (MA1511 and MA1512) or MA1521) and (MA1101R or MA1311 or MA1506 or MA1508E)',
             "DBA3803":'DAO2702',
-            "BSE4711":'-',
+            "BSE4711":'None',
             "BT4012":'BT3102',
-            "BT4015":'-',
+            "BT4015":'None',
             "BT4221":'BT2101 and BT2102 and (CS2010 or CS2020 or CS2040/C)',
             "BT4222":'[(CS1010 or equivalent) and BT2101 and BT2102] or [DAO2702 and DBA3803 and IT3010]',
-            "BT4240":'[MA1311 or MA1101R] and [MA1521 Calculus for Computing or MA1102R Calculus] and [BT2101 Decision Making Methods and Tools]',
+            "BT4240":'[MA1311 or MA1101R] and [MA1521 or MA1102R] and BT2101',
             "IS4241":'[(CS1010 or equivalent) and (IS1103 or IS1103FC or IS1103X)] or [(CS1010 or equivalent) and BT1101] or [DAO2702 and IT3010]',
             "IE4210":'IE2110',
             "ST3131":'ST2131 or MA2216 or ST2334',
