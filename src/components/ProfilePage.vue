@@ -17,9 +17,17 @@
         <div class='column'>
           <div class='green-column'>
             <h2>Graduation Requirements</h2>
-            <h3><u>Graduation Progression</u></h3>
+            <br>
+            <u><h3>Graduation Progression</h3></u>
             <b-progress :value="progression" class="mb-3"></b-progress>
-            <p><b> &#x25a2; No. of MCs completed: </b>{{totalMC}}/180MCs </p>
+            <div class="progress-meter">
+              <div class="meter meter-left" style="width: 25%;"><span class="meter-text">0MCS</span></div>
+              <div class="meter meter-left" style="width: 25%;"><span class="meter-text">40MCS</span></div>
+              <div class="meter meter-right" style="width: 25%;"><span class="meter-text">160MCS</span></div>
+              <div class="meter meter-right" style="width: 25%;"><span class="meter-text">120MCS</span></div>
+            </div>
+            <br><br>
+            <p><b> &#x25a2; No. of MCs completed: </b>{{totalMC}}/160MCs </p>
             <p><b>&#x25a2; ULR (GEM): </b> {{ sumGEM }}/{{Object.keys(this.student.GradReq.GEM).length.toString()}} Modules &#8594; {{ sumGEM*4 }}MCs/{{Object.keys(this.student.GradReq.GEM).length*4}}MCs</p>
             <p><b> &#x25a2; 1k Modules taken: </b>{{ sumLevel1 }}/{{Object.keys(this.student.GradReq.Level1).length.toString()}} Modules &#8594; {{ sumLevel1*4 }}MCs/{{Object.keys(this.student.GradReq.Level1).length*4}}MCs</p>
             <p><b>&#x25a2; Core Modules taken: </b>{{ sumCore }}/{{Object.keys(this.student.GradReq.Core).length.toString()}} Modules &#8594; {{ sumCore*4 }}MCs/{{Object.keys(this.student.GradReq.Core).length*4}}MCs</p>
@@ -469,7 +477,7 @@ export default {
       return countable
     },
     progression: function(){
-      return this.totalMC/180*100
+      return this.totalMC/160*100
     },
   }
 }
@@ -603,4 +611,46 @@ tfoot tr:last-child td:last-child {
   display: inline-block; /* Change this to block and see what happens */
   position:relative;
   }
+
+.progress-meter {
+	min-height: 15px;
+	border-bottom: 2px solid rgb(160, 160, 160);
+}
+
+.progress-meter > .meter {
+	position: relative;
+	float: left;
+	min-height: 15px;
+	border-width: 0px;
+	border-style: solid;
+	border-color: rgb(160, 160, 160);
+}
+
+.progress-meter > .meter-left {
+	border-left-width: 2px;
+}
+
+.progress-meter > .meter-right {
+	float: right;
+	border-right-width: 2px;
+}
+
+.progress-meter > .meter-right:last-child {
+	border-left-width: 2px;
+}
+
+.progress-meter > .meter > .meter-text {
+	position: absolute;
+	display: inline-block;
+	bottom: -20px;
+	width: 100%;
+	font-weight: 700;
+	font-size: 0.85em;
+	color: rgb(160, 160, 160);
+	text-align: left;
+}
+
+.progress-meter > .meter.meter-right > .meter-text {
+	text-align: right;
+}
 </style>
