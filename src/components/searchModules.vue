@@ -10,10 +10,14 @@
       <b-collapse id="collapse-2">
         <b-card>
           <div>
+            Choose Rating:
+            <b-form-select v-model="rating" :options="options_rating"></b-form-select>
             Choose Webcast Availability:
             <b-form-select v-model="webcast" :options="options_webcast"></b-form-select>
             Choose SU Option:
             <b-form-select v-model="SU" :options="options_SU"></b-form-select>
+            Choose Project Work Availability:
+            <b-form-select v-model="project" :options="options_project"></b-form-select>
             Department:
             <input type= "text" v-model="department" placeholder="search department"/>
           </div>
@@ -34,14 +38,18 @@
             <tr>
               <td class="p-left">
                 Exam Date: {{module['History']['0']['ExamDate']}}</td>
+              <td class="p-right">Rating: {{module.rating}}</td>
+            </tr>
+            <tr>
+              <td class="p-left">{{getProject(module.project)}}</td>
               <td class="p-right">Module Credit: {{module.ModuleCredit}}</td>
             </tr>
             <tr> 
               <td class="p-left">Workload: {{module.Workload}}</td>
-              <td class="p-right">SU: {{module.SU}}</td>
+              <td class="p-right">{{getSU(module.su)}}</td>
             </tr>
             <tr> 
-              <td class="p-left">{{module.Webcast}} Available</td>
+              <td class="p-left"> {{getWebcast(module.webcast)}} </td>
             </tr>
         </table>
         <p>{{module.ModuleDescription}}</p>
@@ -73,15 +81,29 @@ export default {
       department: '',
       test: 123,
       webcast: '',
+      project: '',
+      rating:'',
       options_webcast: [
           { value: '', text: 'Choose Webcast Availability' },
-          { value: 'Webcast', text: 'Webcast Available' },
-          { value: 'No Webcast', text: 'No Webcast Available' },
+          { value: '1', text: 'Webcast Available' },
+          { value: '0', text: 'No Webcast Available' },
       ],
       options_SU: [
           { value: '', text: 'Choose SU Option' },
-          { value: 'SU', text: 'SU Option Available' },
-          { value: 'No SU', text: 'No SU Option Available' },
+          { value: '1', text: 'SU Option Available' },
+          { value: '0', text: 'No SU Option Available' },
+      ],
+      options_project: [
+          { value: '', text: 'Choose Project Option' },
+          { value: '1', text: 'Module consists of Project Work' },
+          { value: '0', text: 'Module does not consist of Project Work' },
+      ],
+      options_rating: [
+          { value: 0, text: 'Choose Rating' },
+          { value: 1, text: '>1' },
+          { value: 2, text: '>2' },
+          { value: 3, text: '>3' },
+          { value: 4, text: '>4' },
       ],
     }
   },
@@ -95,24 +117,71 @@ export default {
         return d;
       } );  
     console.log(data);
-    }
+    },
+    getWebcast(input) {
+      if (input == 1) {
+        return "Webcast Available"
+      }
+      else {
+        return "No Webcast Available"
+      }
+    },
+    getSU(input) {
+      if (input == 1) {
+        return "SU Option Available"
+      }
+      else {
+        return "No SU Option Available"
+      }
+    },
+    getProject(input) {
+      if (input == 1) {
+        return "Module consists of Project Work"
+      }
+      else {
+        return "Module does not consist of Project Work"
+      }
+    },
   },
   computed: {
     filteredModules: function () {
       // console.log(modsInfo)
-      
       // this.getData();
+
+      if (this.rating != '') {
+        return this.modules.filter((module) => {
+        // return module['.key'].match(this.search.toUpperCase())
+        if (module.rating > this.rating) {
+          return module.rating
+          }
+      })
+      }
+
       if (this.webcast != '') {
         return this.modules.filter((module) => {
         // return module['.key'].match(this.search.toUpperCase())
-        if (module.Webcast === this.webcast) {return module.Webcast}
+        //console.log(this.webcast===module.webcast.toString())
+        if (module.webcast.toString() ===this.webcast) {
+          return module.webcast.toString().match(this.webcast)
+          }
       })
       }
 
       if (this.SU != '') {
         return this.modules.filter((module) => {
         // return module['.key'].match(this.search.toUpperCase())
-        if (module.SU === this.SU) {return module.SU}
+        if (module.su.toString() === this.SU) {
+          return module.su.toString().match(this.SU)
+          }
+      })
+      }
+
+      if (this.project != '') {
+        return this.modules.filter((module) => {
+        // return module['.key'].match(this.search.toUpperCase())
+        if (module.project.toString() === this.project) {
+          return module.project.toString().match(this.project)
+          }
       })
       }
 
