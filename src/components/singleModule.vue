@@ -6,7 +6,17 @@
       <v-content>  
         
         <v-container fluid grid-list-xl  ma-0 pa-2 >
+         
           <v-layout row justify-end align-start>
+            <v-flex xs5 text-left>
+            <v-switch v-model="showFilter" :label="`Show Filters: ${showFilter}`"></v-switch>
+            <!-- {{checkboxes}} <br>
+            {{this.filters.faculties}} <br> -->
+            <!-- {{filtered_data}} -->
+            <!-- {{this.filtered_data}} -->
+            <!-- {{run}} -->
+            <!-- {{Integer.toString(12)}} -->
+            </v-flex>
             <v-btn class="white--text" color='indigo' v-if="component2==null" v-on:click="component2='module-statistic2'">I want to compare against another module</v-btn>
             <v-flex xs1 sm2>
             <v-text-field
@@ -21,6 +31,56 @@
             <v-btn v-if="component2" v-on:click="displayModule2">GO</v-btn>
           </v-flex>
           </v-layout>
+           <v-layout v-if="showFilter">
+            <v-flex xs12>
+              <v-card>
+                <v-toolbar extended flat height="25px" dark color = "indigo">
+                  <v-toolbar-title class="white--text"><br><b>FILTERS</b></v-toolbar-title>
+                </v-toolbar>
+                <v-layout row>
+                <v-flex xs6 sm6>
+                  Faculty
+                  <v-list-tile v-for="(fac, index) in items" :key="fac">
+                    <v-list-tile-content>
+                        <v-checkbox :value="fac" 
+                                    :key="fac"
+                                    :label="fac"
+                                    v-model="checkboxes[index].checked"
+                                    @change="addFac(fac)">
+                        </v-checkbox>
+                    </v-list-tile-content>
+                </v-list-tile>
+              </v-flex>
+             <!-- {{this.faculties}}
+             <br>
+             {{this.checkboxes}} -->
+             <v-divider vertical = "true"></v-divider>
+             <v-flex xs6 sm6>
+                  <p class = "text-left">From</p>
+                  <v-overflow-btn
+                    :items="semesters"
+                    label="Pick a semester"
+                    target="#dropdown-example"
+                    light = "true"
+                    flat = "false"
+                    v-model="from_sem"
+                  ></v-overflow-btn>
+                  <p class = "text-left">To</p>
+                  <v-overflow-btn
+                    :items="semesters"
+                    label="Pick a semester"
+                    target="#dropdown-example"
+                    v-model="to_sem"
+                    light = true
+                    flat = false
+                  ></v-overflow-btn>
+              </v-flex>
+
+                </v-layout>
+              </v-card>
+            </v-flex>
+          </v-layout>
+          <!-- {{this.filtered_data_mf}} {{this.from_sem.localeCompare('2017S1')}} -->
           <v-layout row class="justify-center">
             
             
@@ -34,13 +94,13 @@
                   </v-toolbar>
               <component 
               v-bind:is ="component" 
-              v-bind:histData_1="histData[0]" 
-              v-bind:radar_data_pos_1="radar_data_pos_1" 
+              v-bind:histData_1="histData[0]"
+              v-bind:radar_data_pos_1="radar_data_pos_1"
               v-bind:radar_data_neg_1="radar_data_neg_1"
               v-bind:show_1="show_1"
               v-bind:pie_data_1="pie_data_1"
               v-bind:bar_data_1="bar_data_1"
-              >  
+              >
               </component>
               </v-card>
               
@@ -109,8 +169,131 @@ export default {
       'module-statistic2': ModuleStatistic2,
       'module-comparator': ModuleComparator
   },
+  watch:{
+    async filtered_data(){
+      console.log("watching filter_data")
+      await this.show_final_marks(this.module1,0);
+      if(this.module2){
+        this.displayModule2();
+      }
+      this.get_pie_1();
+      this.get_bar_1();
+      this.rerender();
+      
+    },
+    async from_sem(){
+      console.log("hehehe")
+      this.get_radar_data_1();
+      this.rerender();
+    },
+    async to_sem(){
+      console.log("hehehe2")
+      this.get_radar_data_1();
+      this.rerender();
+    }
+  },
+  computed: {
+    items () {
+      this.checkboxes = this.faculties.map(fac => {
+        return {
+          checked: false
+        }
+      })
+      
+      return this.faculties
+    },
+    run (){
+      if(this.filtered_data){
+        console.log("run run run")
+        this.show_final_marks(this.module1,0);
+        this.get_pie_1();
+        this.get_bar_1();
+      }
+    }
+    ,
+    filtered_data_mf: function(){
+      let filtered = [];
+      console.log('test mf filtered data');
+      this.from_sem;
+      this.to_sem;
+      let dis = this;
+      
+      let df = db
+        .ref("/mf/data").on("value", function(snapshot) {
+          // console.log(snapshot.val());
+          if(this.from_sem > 2017)          
+          snapshot.val().forEach(function(row) {
+            // console.log(row)
+            // if(dis.filters.faculties.includes(row.Faculty)){
+            //   filtered.push(row);
+            // }
+            // console.log("im here")
+            var year_sem = row.year.toString()+"S"+row.sem.toString();
+            // console.log(year_sem);
+            if(year_sem.localeCompare(dis.from_sem)>=0 & year_sem.localeCompare(dis.to_sem)<=0){
+              filtered.push(row);
+            }
+          });
+          
+      });
+      // console.log("filtered mf coming?")
+      console.log(filtered);
+      return filtered;
+    },
+    filtered_data: function(){
+      let filtered = [];
+      console.log('test filtered data');
+      // console.log(this.filters.faculties.length);
+
+      let dis = this;
+
+      // if(dis.filters.faculties.length == 0){
+      //   // console.log("testing123")
+      //   let test = db
+      //   .ref("/se/data")
+      //   .once("value")
+      //   .then(function(snapshot) {
+      //     var d = snapshot.val();
+      //     // console.log(d);
+      //     // console.log(filtered)
+      //     d.forEach(function(row){
+      //       filtered.push(row);
+      //     });
+      //   });
+      //   console.log(filtered);
+      //   return filtered;
+      // }else{
+      let df = db
+        .ref("/se/data").on("value", function(snapshot) {
+          // console.log(snapshot.val());
+          
+          snapshot.val().forEach(function(row) {
+            // console.log(row.val())
+            if(dis.filters.faculties.includes(row.Faculty)){
+              filtered.push(row);
+            }
+          });
+          
+      });
+      console.log(filtered);
+      return filtered;
+      // }
+      
+      
+    },
+  },
   data() {
     return {
+        filters:{
+          faculties: [],
+        },
+        data: null,
+        semesters: ['2019S1','2018S2','2018S1','2017S2','2017S1'],
+        from_sem: '2017S1',
+        to_sem: '2019S1',
+        showFilter:false,
+        checkboxes:[],
+        faculties:["Business","SOC","Science","FASS","SDE","Engineering"],
         title: true,
         id: this.$route.params.id,
         show_1: true,
@@ -215,7 +398,6 @@ export default {
         },
         module2_pros:{},
         module2_cons:{},
-        test: "penis",
         histData:[],
         //histData:null,
         radar_data_pos_1: {
@@ -266,8 +448,9 @@ export default {
   },
   async mounted(){
     console.log("run")
-    
+    this.filtered_data;
     this.get_radar_data_1(this.module1);
+    console.log("about to run show_final_marks")
     await this.show_final_marks(this.module1,0);
     this.get_pie_1();
     this.get_bar_1();
@@ -277,16 +460,31 @@ export default {
     // this.show_final_marks(this.module2,1);
     // this.get_radar_data_2(this.module2);
   },
+
   methods: {
+    addFac(fac){
+      if(this.filters.faculties.includes(fac)){
+        this.filters.faculties.splice( this.filters.faculties.indexOf(fac), 1 );
+      }else{
+      this.filters.faculties.push(fac);
+      }
+    },
     async get_pie_1(){
       var dic = this.module1_properties["composition"];
       var keys = Object.keys(dic);
+      this.pie_data_1 = [];
       for(var i = 0; i<keys.length; i++){
         var key = keys[i];
-        this.pie_data_1.push([key,dic[key]["number"],]);
+        console.log(key);
+        console.log(this.filters.faculties);
+        // if(this.filters.faculties.includes(key)==false){
+          this.pie_data_1.push([key,dic[key]["number"],]);
+        // }
       }
+      
       console.log("pie pie")
       console.log(this.pie_data_1);
+      // this.rerender();
     },
     async displayModule2(){      
       await this.show_final_marks(this.module2,1);
@@ -296,6 +494,7 @@ export default {
     async get_pie_2(){
       var dic = this.module2_properties["composition"];
       var keys = Object.keys(dic);
+      this.pie_data_2=[];
       for(var i = 0; i<keys.length; i++){
         var key = keys[i];
         this.pie_data_2.push([key,dic[key]["number"],]);
@@ -324,7 +523,105 @@ export default {
       console.log("bar bar2")
       console.log(this.bar_data_2);
     },
-    
+    reset(num){
+      if(num==1){
+        console.log("reset mod1 properties")
+      this.module1_properties = {
+          
+          vote_size: null,
+          std: null,
+          mean: null,
+          median: null,
+          SU: null,
+          webcast: null,
+          rating: null,
+          feedback_pos:{},
+          feedback_neg:{},
+          composition:{
+            "SOC":{
+              "number": 0,
+              "CAP": 0,
+              "cap_size": 0,
+            },
+            "Business":{
+              "number": 0,
+              "CAP": 0,
+              "cap_size": 0,
+            },
+            "Engineering":{
+              "number": 0,
+              "CAP": 0,
+              "cap_size": 0,
+            },
+            "SDE":{
+              "number": 0,
+              "CAP": 0,
+              "cap_size": 0,
+            },
+            "FASS":{
+              "number": 0,
+              "CAP": 0,
+              "cap_size": 0,
+            },
+            "Science":{
+              "number": 0,
+              "CAP": 0,
+              "cap_size": 0,
+            }
+          }
+        };
+        console.log("now mod1 prop")
+        console.log(this.module1_properties);
+      }else{
+        console.log("reset mod2 properties")
+        this.module2_properties = null;
+        this.module2_properties = {
+            vote_size: null,
+            std: null,
+            mean: null,
+            median: null,
+            SU: null,
+            webcast: null,
+            rating: null,
+            feedback_pos:{},
+            feedback_neg:{},
+            composition:{
+              "SOC":{
+                "number": 0,
+                "CAP": 0,
+                "cap_size": 0,
+              },
+              "Business":{
+                "number": 0,
+                "CAP": 0,
+                "cap_size": 0,
+              },
+              "Engineering":{
+                "number": 0,
+                "CAP": 0,
+                "cap_size": 0,
+              },
+              "SDE":{
+                "number": 0,
+                "CAP": 0,
+                "cap_size": 0,
+              },
+              "FASS":{
+                "number": 0,
+                "CAP": 0,
+                "cap_size": 0,
+              },
+              "Science":{
+                "number": 0,
+                "CAP": 0,
+                "cap_size": 0,
+              }
+            }
+          };
+          console.log("now mod2 prop")
+          console.log(this.module2_properties);
+        }
+    },
     
     rerender() {
       this.show_1 = false;
@@ -343,6 +640,7 @@ export default {
       await this.show_final_marks();
       await this.get_radar_data();
     },
+    
     compare_Mod(){
         // var stats = ['std','SU','webcast','rating']
         // var stats = ['std','SU','webcast','rating']
@@ -433,13 +731,28 @@ export default {
     },
     async get_radar_data_1(selected_mod){
       console.log("get radar data 1")
-      let data = await db
-        .ref("/mf/data")
-        .once("value")
-        .then(function(snapshot) {
-          var d = snapshot.val();
-          return d;
+      let data = null;
+      // this.radar_data_pos_1.datasets[0].data=[];
+      // this.radar_data_pos_1.labels=[];
+      // this.radar_data_neg_1.datasets[0].data=[];
+      // this.radar_data_neg_1.labels=[];
+      console.log(this.from_sem)
+      console.log(this.from_sem.localeCompare('2017S1'))
+      // if(this.from_sem.localeCompare('2017S1')==0 & this.to_sem.localeCompare('2019S1')==0){
+        data = await db
+          .ref("/mf/data")
+          .once("value")
+          .then(function(snapshot) {
+            var d = snapshot.val();
+            return d;
         });
+      // }else{
+      //   console.log("radar data 1 using filtered mf")
+      //   data = this.filtered_data_mf;
+      // }
+      // console.log(data)
+      // this.radar_data_pos_1.labels=[];
+      // this.radar_data_pos_1.datasets.data = [];
       var datakeys = Object.keys(data);
       var mapping_pos = {};
       var mapping_neg = {};
@@ -486,8 +799,9 @@ export default {
       // this.radar_data_pos.datasets[0].data=values_pos;
       console.log("new radar data")
       console.log(this.radar_data_pos_1.datasets[0].data);
+      console.log(this.radar_data_neg_1.datasets[0].data);
       // this.radar_data_neg.datasets[0].data=values_neg;
-      this.show=true;
+      this.show = true
       // console.log(this.radar_data_neg_1)
       this.rerender();
       // this.radar_data_pos.update()
@@ -506,6 +820,11 @@ export default {
       var mapping_pos = {};
       var mapping_neg = {}
       var count = 0;
+      console.log(data);
+      // this.radar_data_pos_2.labels=[];
+      // this.radar_data_pos_2.datasets.data = [];
+      // this.radar_data_neg_2.labels=[];
+      // this.radar_data_neg_2.datasets.data = [];
       for (var i = 0; i < data.length; i++) {
         var key = datakeys[i];
         //console.log(typeof this.selected_mod);
@@ -558,18 +877,30 @@ export default {
       // eslint-disable-next-line
       // console.log("help");
       // console.log(this.radar_data_neg)
-      let data = await db
-        .ref("/se/data")
-        .once("value")
-        .then(function(snapshot) {
-          var d = snapshot.val();
-          return d;
+      this.reset(pos+1);
+      let data = null;
+      if(this.filters.faculties.length == 0){
+        data = await db
+          .ref("/se/data")
+          .once("value")
+          .then(function(snapshot) {
+            var d = snapshot.val();
+            return d;
         });
+      }else{
+        data = await this.filtered_data;
+      }
+       
+      
+      console.log("show_final_marks");
+      // let data = await this.filtered_data;
+      console.log(data);
       // eslint-disable-next-line
       console.log(selected_mod);
       // console.log(data)
       var datakeys = Object.keys(data);
-      // console.log(datakeys)
+      console.log("datakeys")
+      console.log(datakeys)
       var hist = {};
       var values = [];
       var total = 0;
@@ -664,6 +995,8 @@ export default {
       this.show = true;
       // this.get_radar_data_1();
       // this.rerender();
+      // this.get_pie_1;
+      // this.get_pie_2;
     }
   }
   // async mounted() {
