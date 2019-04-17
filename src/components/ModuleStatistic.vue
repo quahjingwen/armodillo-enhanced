@@ -16,14 +16,14 @@
     </line-chart>
     <br>
     <br>
-    <strong>Here is an illustration of the positive feedback from students</strong><br>
+    <strong>Here is an illustration of the positive feedback from students (in %)</strong><br>
     <!-- {{max_mod1}}<br> -->
     <!-- {{this.options.scale.ticks}} -->
     <br>
     <div v-if="show_1">
     <radar-chart :chartData="this.radar_data_pos_1" :options="this.options" ></radar-chart>
     <br><br>
-    <strong>Here is an illustration of the negative feedback from students</strong><br><br>
+    <strong>Here is an illustration of the negative feedback from students (in %)</strong><br><br>
     <radar-chart :chartData="this.radar_data_neg_1" :options="this.options"></radar-chart>
     <br><br>
     <strong>Faculty composition of students who have taken this module</strong><br><br>

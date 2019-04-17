@@ -12,10 +12,10 @@
     >
     </line-chart>
     <div v-if="show_2">
-    <br><br><strong>Here is an illustration of the positive feedback from students</strong><br>
+    <br><br><strong>Here is an illustration of the positive feedback from students (in %)</strong><br>
     <br>
     <radar-chart :chartData="this.radar_data_pos_2" :options="this.options"></radar-chart>
-    <br><br><strong>Here is an illustration of the negative feedback from students</strong><br><br>
+    <br><br><strong>Here is an illustration of the negative feedback from students (in %)</strong><br><br>
     <radar-chart :chartData="this.radar_data_neg_2" :options="this.options"></radar-chart>
     <br><br><strong>Faculty composition of students who have taken this module</strong><br><br>
     <pie-chart :data="pie_data_2"></pie-chart>

@@ -5,7 +5,7 @@
     <v-app>
       <v-content>  
         
-        <v-container fluid grid-list-xl  ma-0 pa-2 >
+        <v-container fluid grid-list-xl  ma-2 pa-2 >
          
           <v-layout row justify-end align-start>
             <v-flex xs5 text-left>
@@ -32,7 +32,7 @@
           </v-flex>
           </v-layout>
            <v-layout v-if="showFilter">
-            <v-flex xs12>
+            <v-flex xs12 ma-2 pa-2>
               <v-card>
                 <v-toolbar extended flat height="25px" dark color = "indigo">
                   <v-toolbar-title class="white--text"><br><b>FILTERS</b></v-toolbar-title>
