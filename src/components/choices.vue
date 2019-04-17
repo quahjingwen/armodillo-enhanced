@@ -117,7 +117,10 @@ export default {
       "GEQ1000",
       "BT2101",
       "CS1020"
-    ]
+    ],
+    prereq : {'BT2101':['CS1010S', 'MA1521', 'BT1101'], 'BT2102':['CS1010S', 'BT1101'], 'CS2010': ['CS1020'], 'ST2334': ['MA1521'], 'EC2101': ['EC1301']},
+    preclu : {'GET1004': ['GEK1531'], 'GEH1025':['GEK1522'], 'CS2010':['CS2020', 'CS2030', 'CS2040', 'CS2040C'], 'IS2102': ['ES2002', 'ES2007D', 'CS2101', 'CS2103T', 'ES1601'], 
+    'ST2334':['ST1131', 'ST1232', 'ST2131', 'MA2216', 'CE2407', 'EC2231', 'EC2303', 'PR2103', 'DSC2008'], 'MKT1705X': ['MKT1003'] }
   }),
   props: {
     source: String
@@ -125,7 +128,7 @@ export default {
   methods: {
     async getData() {
       this.data = await db
-        .ref("/shannon/byMajor/Business Analytics")
+        .ref("/shannon/sorted")
         .once("value")
         .then(function(snapshot) {
           var d = snapshot.val();
@@ -138,74 +141,132 @@ export default {
       //console.log(this.data);
       var datakeys = Object.keys(this.data);
       //console.log(datakeys);
-      var modules_PE = {};
-      var modules_GE = {};
-      var modules_UE = {};
-      //console.log(datakeys.length);
-      for (var i = 0; i < datakeys.length; i++) {
-        console.log("are we here");
-        var key = datakeys[i];
-        if (this.data[key]["stu_sem"] == "Y2S1") {
-          this.count += 1;
-          if (this.mods_taken.includes(this.data[key]["ModuleCode"]) == false) {
-            console.log(this.data[key]["ModuleCode"]);
-            //console.log(key);
-            if (this.data[key]["module_type"] == "PE") {
-              //if module is PE, put into PE dict
-              if (modules_PE[this.data[key]["ModuleCode"]] != null) {
-                //console.log('is this working2');
-                modules_PE[this.data[key]["ModuleCode"]] += 1;
-              } else {
-                //console.log('is this working3')
-                modules_PE[this.data[key]["ModuleCode"]] = 1;
-              }
-            } else if (this.data[key]["module_type"] == "GE") {
-              //if module is PE, put into PE dict
-              if (modules_GE[this.data[key]["ModuleCode"]] != null) {
-                //console.log('is this working2');
-                modules_GE[this.data[key]["ModuleCode"]] += 1;
-              } else {
-                //console.log('is this working3')
-                modules_GE[this.data[key]["ModuleCode"]] = 1;
-              }
-            } else {
-              if (modules_UE[this.data[key]["ModuleCode"]] != null) {
-                //console.log('is this working2');
-                modules_UE[this.data[key]["ModuleCode"]] += 1;
-              } else {
-                //console.log('is this working3')
-                modules_UE[this.data[key]["ModuleCode"]] = 1;
+      console.log("here")
+      for(var i=0; i<this.data['PE'].length; i++){
+        if(!(this.data['PE'][i] in this.mods_taken)){
+          var met = false;
+          if(this.prereq[this.data['PE'][i][0]] != null){
+            for(var j=0; j<this.prereq[this.data['PE'][i][0]].length; j++){
+              if (this.mods_taken.includes(this.prereq[this.data['PE'][i][0]][j])){
+                met = true;
+              }else{
+                met = false;
               }
             }
+            if(met == true){
+              if(this.preclu[this.data['PE'][i][0]] != null){
+                for(var k=0; k< this.preclu[this.data['PE'][i][0]].length; k++){
+                  if (this.mods_taken.includes(this.preclu[this.data['PE'][i][0]][k])){
+                    met = false;
+                  }else{
+                    met = true;
+                  }
+                }
+              }
+            }
+          }else{
+            if(this.preclu[this.data['PE'][i][0]] != null){
+              for(var k=0; k< this.preclu[this.data['PE'][i][0]].length; k++){
+                if (this.mods_taken.includes(this.preclu[this.data['PE'][i][0]][k])){
+                  met = false;
+                }else{
+                  met = true;
+                }
+              }
+            }
+          } 
+          if(met == true){
+            this.filtered_mods_PE.push(this.data['PE'][i])
           }
         }
-
-        // Create modules array
-        var filtered_PE = Object.keys(modules_PE).map(function(key) {
-          return [key, modules_PE[key]];
-        });
-        var filtered_GE = Object.keys(modules_GE).map(function(key) {
-          return [key, modules_GE[key]];
-        });
-        var filtered_UE = Object.keys(modules_UE).map(function(key) {
-          return [key, modules_UE[key]];
-        });
-
-        // Sort the array based on the second element
-        filtered_PE.sort(function(first, second) {
-          return second[1] - first[1];
-        });
-        filtered_GE.sort(function(first, second) {
-          return second[1] - first[1];
-        });
-        filtered_UE.sort(function(first, second) {
-          return second[1] - first[1];
-        });
-
-        this.filtered_mods_PE = await filtered_PE.slice(0, this.PE_MCs / 4);
-        this.filtered_mods_GE = await filtered_GE.slice(0, this.GE_MCs / 4);
-        this.filtered_mods_UE = await filtered_UE.slice(1, 1 + this.UE_MCs / 4);
       }
+      for(var i=0; i<this.data['GE'].length; i++){
+        console.log("did it enter GE")
+        if(!(this.data['GE'][i] in this.mods_taken)){
+          console.log("not taken")
+          var met = false;
+          if(this.prereq[this.data['GE'][i][0]] != null){
+            for(var j=0; j<this.prereq[this.data['GE'][i][0]].length; j++){
+              console.log("then what is wrong")
+              if (this.mods_taken.includes(this.prereq[this.data['GE'][i][0]][j])){
+                met = true;
+              }else{
+                met = false;
+              }
+            }
+            if(met == true){
+              if(this.preclu[this.data['GE'][i][0]] != null){
+                for(var k=0; k< this.preclu[this.data['GE'][i][0]].length; k++){
+                  if (this.mods_taken.includes(this.preclu[this.data['GE'][i][0]][k])){
+                    met = false;
+                  }else{
+                    met = true;
+                  }
+                }
+              }
+            }
+          }else{
+            if(this.preclu[this.data['GE'][i][0]] != null){
+              for(var k=0; k< this.preclu[this.data['GE'][i][0]].length; k++){
+                if (this.mods_taken.includes(this.preclu[this.data['GE'][i][0]][k])){
+                  met = false;
+                }else{
+                  met = true;
+                }
+              }
+            }
+          }  
+          if(met == true){
+            console.log("did it come here?")
+            this.filtered_mods_GE.push(this.data['GE'][i])
+          }
+        }
+      }for(var i=0; i<this.data['UE'].length; i++){
+        if(!(this.data['UE'][i] in this.mods_taken)){
+          var met = false;
+          if(this.prereq[this.data['UE'][i][0]] != null){
+            for(var j=0; j<this.prereq[this.data['UE'][i][0]].length; j++){
+              if (this.mods_taken.includes(this.prereq[this.data['UE'][i][0]][j])){
+                met = true;
+              }else{
+                met = false;
+              }
+            }
+            if(met == true){
+              if(this.preclu[this.data['UE'][i][0]] != null){
+                for(var k=0; k< this.preclu[this.data['UE'][i][0]].length; k++){
+                  if (this.mods_taken.includes(this.preclu[this.data['UE'][i][0]][k])){
+                    met = false;
+                  }else{
+                    met = true;
+                  }
+                }
+              }
+            }
+          }else{
+            if(this.preclu[this.data['UE'][i][0]] != null){
+              for(var k=0; k< this.preclu[this.data['UE'][i][0]].length; k++){
+                if (this.mods_taken.includes(this.preclu[this.data['UE'][i][0]][k])){
+                  met = false;
+                }else{
+                  met = true;
+                }
+              }
+            }
+          } 
+          if(met == true){
+            this.filtered_mods_UE.push(this.data['UE'][i])
+          }
+        }
+      }
+      this.filtered_mods_PE = await this.filtered_mods_PE.slice(0, this.PE_MCs / 4);
+      this.filtered_mods_GE = await this.filtered_mods_GE.slice(0, this.GE_MCs / 4);
+      console.log("filtered_mods_GE")
+      console.log(filtered_mods_GE)
+      this.filtered_mods_UE = await this.filtered_mods_UE.slice(1, 1 + this.UE_MCs / 4);
+      console.log(this.filtered_mods_UE)
+
+      
     },
     async getDescData() {
       this.descData = await db
