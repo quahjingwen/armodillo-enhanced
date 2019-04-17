@@ -87,6 +87,7 @@
       </div>
     </div>
     <div class="text-xs-center"></div>
+     <v-btn color="primary" to="/choose">back </v-btn>
   </div>
 </template>
 

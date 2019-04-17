@@ -1,12 +1,10 @@
 <template>
 <div>
   <div class="choose">
-    <h3>Help me choose my modules</h3>
-    <button @click="goReco" id="close-image"><img src="../assets/selection.png" height= "200px" ></button>
+    <button class ="test" @click="goReco" id="close-image">Help me Choose my Modules!<img src="../assets/selection.png" height= "200px" ></button>
   </div>
   <div class="choose2">
-    <h3> Let me choose my modules! </h3>
-    <button @click = "goList" id="close-image"><img src="../assets/choices.png" height= "200px" ></button>
+    <button class="test" @click = "goList" id="close-image">Let me choose my modules!<img src="../assets/choices.png" height= "200px" ></button>
   </div>
   </div>
 </template>
@@ -38,15 +36,27 @@ export default {
 .choose{
   display:inline-block;
   margin: 30px;
-  border: solid;
-    border-color: darkgray;
   padding: 5px;
 }
 .choose2{
   display: inline-block;
   margin: 30px;
-  border: solid;
-  border-color: darkgray;
+
   padding: 5px;
+}
+
+.test{
+background-color:rgb(253, 98, 27);
+border: #2e6da4;
+font-family: Arial, Geneva, Arial, Helvetica,  sans-serif;
+font-size: 20px;
+color: #fff;
+letter-spacing: 1px;
+padding: 8px 12px;
+font-size: 20px;
+font-weight: normal;
+border-radius: 4px;
+line-height: 1.5;
+text-decoration:none
 }
 </style>

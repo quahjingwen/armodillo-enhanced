@@ -42,6 +42,7 @@
       </div>
     </div>
     <br>
+    <v-btn color="primary" to="/choose">back </v-btn>
   </div>
 </template>
 <script>

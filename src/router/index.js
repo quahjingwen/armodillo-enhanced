@@ -21,8 +21,8 @@ export default new Router({
         },
         {
             path:"/",
-            name: "Home",
-            component: Home
+            name: "Modules",
+            component: searchModules
         },
         {
             path:"/choose",
