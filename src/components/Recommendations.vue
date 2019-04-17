@@ -39,7 +39,7 @@ export default {
   methods:{
     async getData(){
     this.data = await db
-      .ref("/shannon/data/-Lb2LdxrwgAn5CahJcLc")
+      .ref("/shannon/sorted")
       .once("value")
       .then(function(snapshot) {
         var d = snapshot.val();
