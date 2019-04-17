@@ -17,12 +17,14 @@
     <br>
     <br>
     <strong>Here is an illustration of the positive feedback from students</strong><br>
+    <!-- {{max_mod1}}<br> -->
+    <!-- {{this.options.scale.ticks}} -->
     <br>
     <div v-if="show_1">
-    <radar-chart :chartData="this.radar_data_pos_1"></radar-chart>
+    <radar-chart :chartData="this.radar_data_pos_1" :options="this.options" ></radar-chart>
     <br><br>
     <strong>Here is an illustration of the negative feedback from students</strong><br><br>
-    <radar-chart :chartData="this.radar_data_neg_1" ></radar-chart>
+    <radar-chart :chartData="this.radar_data_neg_1" :options="this.options"></radar-chart>
     <br><br>
     <strong>Faculty composition of students who have taken this module</strong><br><br>
     <pie-chart :data="pie_data_1"></pie-chart>
@@ -63,14 +65,34 @@ import test from "./test.vue"
 // console.log(LineChart)
 export default {
   name: "ModuleStatistic",
-  props:['module1','module1_properties','radar_data_pos_1','radar_data_neg_1','histData_1','show_1','pie_data_1','bar_data_1'],
+  props:['max_mod1','module1','module1_properties','radar_data_pos_1','radar_data_neg_1','histData_1','show_1','pie_data_1','bar_data_1'],
   components:{
     RadarChart,
-    test
+  },
+  computed:{
+    // options() {
+    //   return {scale:{
+    //       ticks:{
+    //         min:0,
+    //         max:max_mod1
+    //       }}
+
+    //     }
+    // }
   },
   data() {
     return {
-      //test: "penis",
+      options: {
+        scale:{
+          ticks:{
+            min:0,
+            // max:max_mod1
+            max:20,
+            stepSize: 5
+          }
+
+        }
+      },
       pie_data:[],
       selected_mod: null,
       radar_data_pos: {

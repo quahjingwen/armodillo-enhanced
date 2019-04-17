@@ -12,10 +12,11 @@
     >
     </line-chart>
     <div v-if="show_2">
-    <br><br><strong>Here is an illustration of the positive feedback from students</strong><br><br>
-    <radar-chart :chartData="this.radar_data_pos_2"></radar-chart>
+    <br><br><strong>Here is an illustration of the positive feedback from students</strong><br>
+    <br>
+    <radar-chart :chartData="this.radar_data_pos_2" :options="this.options"></radar-chart>
     <br><br><strong>Here is an illustration of the negative feedback from students</strong><br><br>
-    <radar-chart :chartData="this.radar_data_neg_2"></radar-chart>
+    <radar-chart :chartData="this.radar_data_neg_2" :options="this.options"></radar-chart>
     <br><br><strong>Faculty composition of students who have taken this module</strong><br><br>
     <pie-chart :data="pie_data_2"></pie-chart>
     </div>
@@ -55,12 +56,26 @@ import RadarChart from './charts/radarchart.js'
 // console.log(LineChart)
 export default {
   name: "ModuleStatistic2",
-  props:['module2','module2_properties','radar_data_pos_2','radar_data_neg_2','histData_2','show_2','pie_data_2','bar_data_2'],
+  props:['max_mod1','module2','module2_properties','radar_data_pos_2','radar_data_neg_2','histData_2','show_2','pie_data_2','bar_data_2'],
   components:{
     RadarChart
   },
+  computed(){
+    
+  },
   data() {
     return {
+      options: {
+        scale:{
+          ticks:{
+            min:0,
+            // max:max_mod1
+            max:20,
+            stepSize:5
+          }
+
+        }
+      },
       show: null,
       histData: {},
       std: null,  

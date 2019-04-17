@@ -2,6 +2,10 @@
     <div>
         <v-app>
             <v-container fluid ma-0 pa-0>
+                <v-layout-row>
+                    <h4><b>Pros and Cons are aggregated* from the results displayed in the above graphs</b></h4><br>
+                    <small><i>*Positive and negative qualities that are above the mean will be displayed in the Pros and Cons respectively</i></small>
+                </v-layout-row>
                 <v-layout row>
                 <v-flex xs6>
                     <v-card v-if="show_1">

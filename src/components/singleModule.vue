@@ -100,6 +100,7 @@
               v-bind:show_1="show_1"
               v-bind:pie_data_1="pie_data_1"
               v-bind:bar_data_1="bar_data_1"
+              v-bind:max_mod1="max_mod1"
               >
               </component>
               </v-card>
@@ -124,6 +125,7 @@
               v-bind:show_2="show_1"
               v-bind:pie_data_2="pie_data_2"
               v-bind:bar_data_2="bar_data_2"
+              v-bind:max_mod1="max_mod1"
               > 
               </component>
               </v-card>
@@ -181,18 +183,32 @@ export default {
       this.rerender();
       
     },
-    async from_sem(){
-      console.log("hehehe")
-      this.get_radar_data_1();
-      this.rerender();
+    async filtered_data_mf(){
+      console.log("test watcher for filtered mf")
+      this.get_radar_data_1(this.module1);
+      if(this.module2){
+        this.displayModule2();
+      }
+      // this.get_radar_data_2(this.module2);
+      
     },
-    async to_sem(){
-      console.log("hehehe2")
-      this.get_radar_data_1();
+    async max_mod1(){
       this.rerender();
     }
   },
   computed: {
+    max_mod1() {
+      if(this.module2 != null){
+        return Math.round(Math.max(Math.max.apply(Math, this.radar_data_pos_1.datasets[0].data),
+      Math.max.apply(Math, this.radar_data_neg_1.datasets[0].data),
+      Math.max.apply(Math, this.radar_data_pos_2.datasets[0].data),
+      Math.max.apply(Math, this.radar_data_neg_2.datasets[0].data)))+1
+      }else{
+        return Math.round(Math.max(Math.max.apply(Math, this.radar_data_pos_1.datasets[0].data),
+      Math.max.apply(Math, this.radar_data_neg_1.datasets[0].data)))+1
+      }
+      
+    },
     items () {
       this.checkboxes = this.faculties.map(fac => {
         return {
@@ -202,41 +218,33 @@ export default {
       
       return this.faculties
     },
-    run (){
-      if(this.filtered_data){
-        console.log("run run run")
-        this.show_final_marks(this.module1,0);
-        this.get_pie_1();
-        this.get_bar_1();
-      }
-    }
-    ,
     filtered_data_mf: function(){
       let filtered = [];
       console.log('test mf filtered data');
       this.from_sem;
       this.to_sem;
       let dis = this;
-      
+      this.filters.faculties;
       let df = db
         .ref("/mf/data").on("value", function(snapshot) {
           // console.log(snapshot.val());
-          if(this.from_sem > 2017)          
+          // if(this.from_sem > 2017)      
           snapshot.val().forEach(function(row) {
-            // console.log(row)
-            // if(dis.filters.faculties.includes(row.Faculty)){
-            //   filtered.push(row);
-            // }
-            // console.log("im here")
             var year_sem = row.year.toString()+"S"+row.sem.toString();
-            // console.log(year_sem);
-            if(year_sem.localeCompare(dis.from_sem)>=0 & year_sem.localeCompare(dis.to_sem)<=0){
+            if(dis.filters.faculties.length == 0){
+              if(dis.from_sem.localeCompare(year_sem)<=0 & dis.to_sem.localeCompare(year_sem)>=0){
+                filtered.push(row);  
+              }
+            }
+            if(dis.filters.faculties.includes(row.faculty) & (dis.from_sem.localeCompare(year_sem)<=0 & dis.to_sem.localeCompare(year_sem)>=0)){
+            // if(dis.filters.faculties.includes(row.Faculty)){
+              
               filtered.push(row);
             }
           });
           
       });
-      // console.log("filtered mf coming?")
+      console.log("filtered mf coming?")
       console.log(filtered);
       return filtered;
     },
@@ -246,30 +254,20 @@ export default {
       // console.log(this.filters.faculties.length);
 
       let dis = this;
-
-      // if(dis.filters.faculties.length == 0){
-      //   // console.log("testing123")
-      //   let test = db
-      //   .ref("/se/data")
-      //   .once("value")
-      //   .then(function(snapshot) {
-      //     var d = snapshot.val();
-      //     // console.log(d);
-      //     // console.log(filtered)
-      //     d.forEach(function(row){
-      //       filtered.push(row);
-      //     });
-      //   });
-      //   console.log(filtered);
-      //   return filtered;
-      // }else{
       let df = db
         .ref("/se/data").on("value", function(snapshot) {
           // console.log(snapshot.val());
           
           snapshot.val().forEach(function(row) {
             // console.log(row.val())
-            if(dis.filters.faculties.includes(row.Faculty)){
+            var year_sem = row.year.toString() + "S" + row.sem.toString();
+            if(dis.filters.faculties.length == 0){
+              if(dis.from_sem.localeCompare(year_sem)<=0 & dis.to_sem.localeCompare(year_sem)>=0){
+                filtered.push(row);  
+              }
+            }
+            if(dis.filters.faculties.includes(row.Faculty) & (dis.from_sem.localeCompare(year_sem)<=0 & dis.to_sem.localeCompare(year_sem)>=0)){
+            // if(dis.filters.faculties.includes(row.Faculty)){
               filtered.push(row);
             }
           });
@@ -288,9 +286,9 @@ export default {
           faculties: [],
         },
         data: null,
-        semesters: ['2019S1','2018S2','2018S1','2017S2','2017S1'],
+        semesters: ['2019S2','2019S1','2018S2','2018S1','2017S2','2017S1'],
         from_sem: '2017S1',
-        to_sem: '2019S1',
+        to_sem: '2019S2',
         showFilter:false,
         checkboxes:[],
         faculties:["Business","SOC","Science","FASS","SDE","Engineering"],
@@ -449,6 +447,7 @@ export default {
   async mounted(){
     console.log("run")
     this.filtered_data;
+    this.filtered_data_mf;
     this.get_radar_data_1(this.module1);
     console.log("about to run show_final_marks")
     await this.show_final_marks(this.module1,0);
@@ -645,6 +644,15 @@ export default {
         // var stats = ['std','SU','webcast','rating']
         // var stats = ['std','SU','webcast','rating']
         console.log("comparing modules")
+        this.module1_pros = null;
+        this.module1_pros = {}
+        this.module1_cons = {};
+        this.module2_pros = {};
+        this.module2_cons = {};
+        console.log(this.module1_pros);
+        console.log(this.module2_cons);
+        
+
         var stats = ['std','SU','webcast']
         for (var i=0;i<stats.length;i++){
             var key = [stats[i]];
@@ -675,7 +683,9 @@ export default {
         var dict = this.module1_properties["feedback_pos"];
         var total1 = this.module1_properties["vote_size"]
         var total2 = this.module2_properties["vote_size"]
-        console.log(dict)
+        console.log("test the feedback pos")
+        console.log(this.module1_properties["feedback_pos"])
+        console.log(total1)
         var labels = Object.keys(dict);
         for(var j = 0; j<labels.length; j++){
             var key_fp = labels[j];
@@ -732,13 +742,9 @@ export default {
     async get_radar_data_1(selected_mod){
       console.log("get radar data 1")
       let data = null;
-      // this.radar_data_pos_1.datasets[0].data=[];
-      // this.radar_data_pos_1.labels=[];
-      // this.radar_data_neg_1.datasets[0].data=[];
-      // this.radar_data_neg_1.labels=[];
       console.log(this.from_sem)
       console.log(this.from_sem.localeCompare('2017S1'))
-      // if(this.from_sem.localeCompare('2017S1')==0 & this.to_sem.localeCompare('2019S1')==0){
+      if(this.filters.faculties.length == 0 & (this.from_sem.localeCompare('2017S1')==0 & this.to_sem.localeCompare('2019S2')==0)){
         data = await db
           .ref("/mf/data")
           .once("value")
@@ -746,13 +752,15 @@ export default {
             var d = snapshot.val();
             return d;
         });
-      // }else{
-      //   console.log("radar data 1 using filtered mf")
-      //   data = this.filtered_data_mf;
-      // }
-      // console.log(data)
-      // this.radar_data_pos_1.labels=[];
-      // this.radar_data_pos_1.datasets.data = [];
+      }else{
+        console.log("radar data 1 using filtered mf")
+        data = await this.filtered_data_mf;
+      }
+      console.log(data)
+      this.radar_data_pos_1.labels=[];
+      this.radar_data_pos_1.datasets[0].data = [];
+      this.radar_data_neg_1.labels=[];
+      this.radar_data_neg_1.datasets[0].data = [];
       var datakeys = Object.keys(data);
       var mapping_pos = {};
       var mapping_neg = {};
@@ -787,10 +795,10 @@ export default {
       this.module1_properties["vote_size"]=count;
       for(var label in this.radar_data_pos_1.labels){
         // console.log(this.radar_data_pos_1.labels[label]);
-        this.radar_data_pos_1.datasets[0].data.push(mapping_pos[this.radar_data_pos_1.labels[label]]);
+        this.radar_data_pos_1.datasets[0].data.push(mapping_pos[this.radar_data_pos_1.labels[label]]/count*100);
       }
       for(var label_neg in this.radar_data_neg_1.labels){
-        this.radar_data_neg_1.datasets[0].data.push(mapping_neg[this.radar_data_neg_1.labels[label_neg]]);
+        this.radar_data_neg_1.datasets[0].data.push(mapping_neg[this.radar_data_neg_1.labels[label_neg]]/count*100);
       }
       this.module1_properties["feedback_pos"]=mapping_pos;
       console.log("current feedback pos 1")
@@ -809,22 +817,36 @@ export default {
     },
     async get_radar_data_2(selected_mod){
       console.log("get radar data 2")
-      let data = await db
-        .ref("/mf/data")
-        .once("value")
-        .then(function(snapshot) {
-          var d = snapshot.val();
-          return d;
+      // let data = await db
+      //   .ref("/mf/data")
+      //   .once("value")
+      //   .then(function(snapshot) {
+      //     var d = snapshot.val();
+      //     return d;
+      //   });
+      var data = null;
+      if(this.filters.faculties.length == 0 & (this.from_sem.localeCompare('2017S1')==0 & this.to_sem.localeCompare('2019S2')==0)){
+        data = await db
+          .ref("/mf/data")
+          .once("value")
+          .then(function(snapshot) {
+            var d = snapshot.val();
+            return d;
         });
+      }else{
+        console.log("radar data 1 using filtered mf")
+        data = await this.filtered_data_mf;
+      }
+      
       var datakeys = Object.keys(data);
       var mapping_pos = {};
       var mapping_neg = {}
       var count = 0;
       console.log(data);
-      // this.radar_data_pos_2.labels=[];
-      // this.radar_data_pos_2.datasets.data = [];
-      // this.radar_data_neg_2.labels=[];
-      // this.radar_data_neg_2.datasets.data = [];
+      this.radar_data_pos_2.labels=[];
+      this.radar_data_pos_2.datasets[0].data = [];
+      this.radar_data_neg_2.labels=[];
+      this.radar_data_neg_2.datasets[0].data = [];
       for (var i = 0; i < data.length; i++) {
         var key = datakeys[i];
         //console.log(typeof this.selected_mod);
@@ -857,10 +879,10 @@ export default {
       this.module2_properties["feedback_neg"]=mapping_neg;
       for(var label in this.radar_data_pos_2.labels){
         // console.log(this.radar_data_pos_2.labels[label]);
-        this.radar_data_pos_2.datasets[0].data.push(mapping_pos[this.radar_data_pos_2.labels[label]]);
+        this.radar_data_pos_2.datasets[0].data.push(mapping_pos[this.radar_data_pos_2.labels[label]]/count*100);
       }
       for(var label_neg in this.radar_data_neg_2.labels){
-        this.radar_data_neg_2.datasets[0].data.push(mapping_neg[this.radar_data_neg_2.labels[label_neg]]);
+        this.radar_data_neg_2.datasets[0].data.push(mapping_neg[this.radar_data_neg_2.labels[label_neg]]/count*100);
       }
       // this.radar_data_pos.datasets[0].data=values_pos;
       console.log("new radar data")
@@ -879,7 +901,8 @@ export default {
       // console.log(this.radar_data_neg)
       this.reset(pos+1);
       let data = null;
-      if(this.filters.faculties.length == 0){
+      console.log(this.from_sem.localeCompare("2017S1")==0)
+      if(this.filters.faculties.length == 0 & (this.from_sem.localeCompare("2017S1")==0 & this.to_sem.localeCompare("2019S2")==0)){
         data = await db
           .ref("/se/data")
           .once("value")
@@ -929,8 +952,8 @@ export default {
             this.module1_properties["composition"][data[key]["Faculty"]]["number"]=this.module1_properties["composition"][data[key]["Faculty"]]["number"]+1;
             //console.log(data[key]["CAP"])
             if(data[key]["CAP"]>0){
-              console.log(data[key]["CAP"])
-              console.log(this.module1_properties["composition"][data[key]["Faculty"]]["cap_size"])
+              // console.log(data[key]["CAP"])
+              // console.log(this.module1_properties["composition"][data[key]["Faculty"]]["cap_size"])
               this.module1_properties["composition"][data[key]["Faculty"]]["cap_size"]=this.module1_properties["composition"][data[key]["Faculty"]]["cap_size"]+1;
               this.module1_properties["composition"][data[key]["Faculty"]]["CAP"]=this.module1_properties["composition"][data[key]["Faculty"]]["CAP"]+data[key]["CAP"];
             }
@@ -940,7 +963,7 @@ export default {
             this.module2_properties["SU"]=this.module2_properties["SU"]+data[key]["SU"];
             this.module2_properties["composition"][data[key]["Faculty"]]["number"]=this.module2_properties["composition"][data[key]["Faculty"]]["number"]+1;
             if(data[key]["CAP"]>0){
-              console.log(data[key]["CAP"])
+              // console.log(data[key]["CAP"])
               this.module2_properties["composition"][data[key]["Faculty"]]["cap_size"]=this.module2_properties["composition"][data[key]["Faculty"]]["cap_size"]+1;
               this.module2_properties["composition"][data[key]["Faculty"]]["CAP"]=this.module2_properties["composition"][data[key]["Faculty"]]["CAP"]+data[key]["CAP"];
             }
